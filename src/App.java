@@ -12,6 +12,7 @@ public class App {
     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
     FlappyBird flappyBird = new FlappyBird();
+    flappyBird.startGame();
     frame.add(flappyBird);
     frame.pack();
     flappyBird.requestFocus();

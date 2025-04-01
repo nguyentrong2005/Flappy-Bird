@@ -31,7 +31,7 @@ public class FlappyBird extends JPanel implements ActionListener, KeyListener {
   // game start
   boolean gameStarted = false;
 
-  class Bird {
+  public class Bird {
 
     int x = birdX;
     int y = birdY;
@@ -50,7 +50,7 @@ public class FlappyBird extends JPanel implements ActionListener, KeyListener {
   int pipeWidth = 64; // scaled by 1/6
   int pipeHeight = 512;
 
-  class Pipe {
+  public class Pipe {
 
     int x = pipeX;
     int y = pipeY;
@@ -81,31 +81,21 @@ public class FlappyBird extends JPanel implements ActionListener, KeyListener {
 
   FlappyBird() {
     setPreferredSize(new Dimension(boardWidth, boardHeight));
-    // setBackground(Color.BLUE);
     setFocusable(true);
     addKeyListener(this);
 
     // Load images
-    backgroundImg = new ImageIcon(getClass().getResource("images/flappybirdbg.png")).getImage();
-    birdImg = new ImageIcon(getClass().getResource("images/flappybird.png")).getImage();
-    topPipeImg = new ImageIcon(getClass().getResource("images/toppipe.png")).getImage();
-    bottomPipeImg = new ImageIcon(getClass().getResource("images/bottompipe.png")).getImage();
+    backgroundImg = new ImageIcon(getClass().getResource("images/flappyBirdBG.png")).getImage();
+    birdImg = new ImageIcon(getClass().getResource("images/flappyBird.png")).getImage();
+    topPipeImg = new ImageIcon(getClass().getResource("images/topPipe.png")).getImage();
+    bottomPipeImg = new ImageIcon(getClass().getResource("images/bottomPipe.png")).getImage();
 
     // bird
     bird = new Bird(birdImg);
-    pipes = new ArrayList<Pipe>();
-
-    // start playing background music
-    playSound("./audio/start.wav", 1f);
-    playSound("./audio/background.wav", 1f);
+    pipes = new ArrayList<>();
 
     // place pipes timer
-    placePipesTimer = new Timer(1500, new ActionListener() {
-      @Override
-      public void actionPerformed(ActionEvent e) {
-        placePipes();
-      }
-    });
+    placePipesTimer = new Timer(1500, e -> placePipes());
 
     // game timer
     gameLoop = new Timer(1000 / 60, this); // 1000ms/60fps = 16.6666666667ms
@@ -114,6 +104,12 @@ public class FlappyBird extends JPanel implements ActionListener, KeyListener {
       placePipesTimer.start();
       gameLoop.start();
     }
+  }
+
+  public void startGame() {
+    // start playing background music
+    playSound("./audio/start.wav", 1f);
+    playSound("./audio/background.wav", 1f);
   }
 
   public void placePipes() {
@@ -133,6 +129,7 @@ public class FlappyBird extends JPanel implements ActionListener, KeyListener {
     pipes.add(bottomPipe);
   }
 
+  @Override
   public void paintComponent(Graphics g) {
     super.paintComponent(g);
     draw(g);
@@ -260,9 +257,7 @@ public class FlappyBird extends JPanel implements ActionListener, KeyListener {
 
   // Sound game
   public void playSound(String soundFile, float volume) {
-    try {
-      File file = new File(soundFile);
-      AudioInputStream audioStream = AudioSystem.getAudioInputStream(file);
+    try (AudioInputStream audioStream = AudioSystem.getAudioInputStream(new File(soundFile))) {
       Clip clip = AudioSystem.getClip();
       clip.open(audioStream);
 
@@ -283,9 +278,8 @@ public class FlappyBird extends JPanel implements ActionListener, KeyListener {
         clip.start();
       }
 
-      audioStream.close();
     } catch (UnsupportedAudioFileException | IOException | LineUnavailableException e) {
-      e.printStackTrace();
+      System.err.println("Lỗi phát âm thanh: " + e.getMessage());
     }
   }
 
@@ -331,7 +325,7 @@ public class FlappyBird extends JPanel implements ActionListener, KeyListener {
             "./audio/replay2.wav",
             "./audio/replay3.wav"
         };
-        Random random = new Random();
+        // Random random = new Random();
         String randomSound = sounds[random.nextInt(sounds.length)];
 
         playSound(randomSound, 1f);
