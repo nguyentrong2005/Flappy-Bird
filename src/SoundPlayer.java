@@ -1,17 +1,14 @@
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
 import javax.sound.sampled.*;
 
 public class SoundPlayer {
 
   private static Clip backgroundClip;
-  private static final HashMap<String, Clip> clipCache = new HashMap<>();
-  private static Clip currentClip; // Thêm clip hiện tại (dùng cho các file khác)
+  private static Clip currentClip;
 
   public static void play(String filePath, float volume) {
     try {
-      // Nếu là background thì dùng riêng
       if (filePath.equals("./audio/background.wav")) {
         if (backgroundClip != null && backgroundClip.isRunning())
           return;
@@ -24,7 +21,6 @@ public class SoundPlayer {
         return;
       }
 
-      // Các âm thanh khác
       AudioInputStream audioStream = AudioSystem.getAudioInputStream(new File(filePath));
       Clip clip = AudioSystem.getClip();
       clip.open(audioStream);

@@ -20,7 +20,7 @@ public class AnimatedBackgroundPanel extends JPanel {
     bottomPipeImg = new ImageIcon(getClass().getResource("images/bottomPipe.png")).getImage();
 
     pipes = new ArrayList<>();
-    addPipeLogin();
+    addPipe();
 
     timer = new Timer(16, e -> {
       movePipes();
@@ -29,11 +29,11 @@ public class AnimatedBackgroundPanel extends JPanel {
     timer.start();
   }
 
-  void addPipeLogin() {
+  private void addPipe() {
     int x = 400;
     int topY = -random.nextInt(pipeHeight / 2);
-    pipes.add(new Rectangle(x, topY, pipeWidth, pipeHeight)); // top pipe
-    pipes.add(new Rectangle(x, topY + pipeHeight + gap, pipeWidth, pipeHeight)); // bottom pipe
+    pipes.add(new Rectangle(x, topY, pipeWidth, pipeHeight));
+    pipes.add(new Rectangle(x, topY + pipeHeight + gap, pipeWidth, pipeHeight));
   }
 
   void movePipes() {
@@ -42,7 +42,7 @@ public class AnimatedBackgroundPanel extends JPanel {
     }
     if (pipes.get(0).x + pipeWidth < 0) {
       pipes.clear();
-      addPipeLogin();
+      addPipe();
     }
   }
 
