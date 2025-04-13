@@ -66,6 +66,11 @@ class AuthManager {
     }
   }
 
+  public static int getHighScore(String username) throws IOException {
+    Map<String, Integer> scores = loadScores();
+    return scores.getOrDefault(username, 0);
+  }
+
   private static Map<String, Integer> loadScores() throws IOException {
     Map<String, Integer> scores = new HashMap<>();
     File file = new File(SCORES_FILE);

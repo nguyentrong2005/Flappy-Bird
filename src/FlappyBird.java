@@ -13,6 +13,10 @@ public class FlappyBird extends JPanel implements ActionListener, KeyListener {
   int boardHeight = 640;
   int moveSpeed = 2;
 
+  // User
+  String username;
+  int highScore = 0;
+
   // Images
   Image backgroundImg;
   Image birdImg;
@@ -76,7 +80,15 @@ public class FlappyBird extends JPanel implements ActionListener, KeyListener {
   boolean gameOver = false;
   double score = 0;
 
-  FlappyBird() {
+  FlappyBird(String username) {
+    this.username = username;
+    try {
+      this.highScore = AuthManager.getHighScore(username);
+    } catch (Exception e) {
+      e.printStackTrace();
+      this.highScore = 0;
+    }
+
     setPreferredSize(new Dimension(boardWidth, boardHeight));
     setFocusable(true);
     addKeyListener(this);
@@ -160,6 +172,15 @@ public class FlappyBird extends JPanel implements ActionListener, KeyListener {
       if ((System.currentTimeMillis() / 500) % 2 == 0) {
         g.drawString("Game Over: " + String.valueOf((int) score), 10, 35);
       }
+      g.drawString("Username: " + username, 100, 240);
+      g.drawString("Your Score: " + (int) score, 100, 270);
+      g.drawString("High Score: " + highScore, 100, 300);
+      if ((int) score > highScore) {
+        g.setColor(Color.YELLOW);
+        g.drawString("New Record!", 100, 330);
+      }
+      g.setColor(Color.WHITE);
+      g.drawString("Press SPACE to play again", 70, 380);
     } else {
       g.drawString(String.valueOf((int) score), 10, 35);
     }
@@ -254,6 +275,14 @@ public class FlappyBird extends JPanel implements ActionListener, KeyListener {
     move();
     repaint();
     if (gameOver) {
+      if ((int) score > highScore) {
+        highScore = (int) score;
+        try {
+          AuthManager.saveHighScore(username, highScore);
+        } catch (Exception ex) {
+          ex.printStackTrace();
+        }
+      }
       SoundPlayer.play("./audio/hit.wav", 0.9f);
       placePipesTimer.stop();
       gameLoop.stop();

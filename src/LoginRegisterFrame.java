@@ -37,17 +37,17 @@ public class LoginRegisterFrame extends JFrame {
     JLabel userLabel = new JLabel("Username:");
     userLabel.setForeground(Color.WHITE);
     userLabel.setFont(new Font("Arial", Font.PLAIN, 16));
-    
+
     JLabel passLabel = new JLabel("Password:");
     passLabel.setForeground(Color.WHITE);
     passLabel.setFont(new Font("Arial", Font.PLAIN, 16));
-    
+
     usernameField = new JTextField();
     usernameField.setFont(new Font("Arial", Font.PLAIN, 16));
-    
+
     passwordField = new JPasswordField();
     passwordField.setFont(new Font("Arial", Font.PLAIN, 16));
-    
+
     usernameField.setBorder(new LineBorder(Color.GRAY));
     passwordField.setBorder(new LineBorder(Color.GRAY));
 
@@ -110,8 +110,8 @@ public class LoginRegisterFrame extends JFrame {
         if (AuthManager.loginUser(username, password)) {
           JOptionPane.showMessageDialog(this, "Đăng nhập thành công!");
           SoundPlayer.stopCurrent();
-          // dispose(); // Đóng cửa sổ đăng nhập
-          new App(); // Gọi game Flappy Bird
+          dispose(); // Đóng cửa sổ đăng nhập
+          App.launchGame(username); // Gọi game
         } else {
           JOptionPane.showMessageDialog(this, "Sai tài khoản hoặc mật khẩu!");
         }
@@ -127,9 +127,5 @@ public class LoginRegisterFrame extends JFrame {
       ex.printStackTrace();
       JOptionPane.showMessageDialog(this, "Lỗi xử lý: " + ex.getMessage());
     }
-  }
-
-  public static void main(String[] args) {
-    new LoginRegisterFrame(); // Chạy giao diện đăng nhập trước
   }
 }

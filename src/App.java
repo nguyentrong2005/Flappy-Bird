@@ -1,7 +1,11 @@
 import javax.swing.*;
 
 public class App {
-  public static void main(String[] args) throws Exception {
+  public static void main(String[] args) {
+    new LoginRegisterFrame(); // Gọi màn hình đăng nhập trước
+  }
+
+  public static void launchGame(String username) {
     int boardWidth = 360;
     int boardHeight = 640;
 
@@ -11,7 +15,7 @@ public class App {
     frame.setResizable(false);
     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-    FlappyBird flappyBird = new FlappyBird();
+    FlappyBird flappyBird = new FlappyBird(username);
     flappyBird.startGame();
     frame.add(flappyBird);
     frame.pack();
