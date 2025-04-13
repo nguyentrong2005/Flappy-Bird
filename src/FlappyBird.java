@@ -17,6 +17,10 @@ public class FlappyBird extends JPanel implements ActionListener, KeyListener {
   String username;
   int highScore = 0;
 
+  // Over
+  private boolean showGameOverText = true;
+  private Timer gameOverBlinkTimer;
+
   // Images
   Image backgroundImg;
   Image birdImg;
@@ -169,21 +173,44 @@ public class FlappyBird extends JPanel implements ActionListener, KeyListener {
     g.setColor(Color.WHITE);
     g.setFont(new Font("Arial", Font.PLAIN, 32));
     if (gameOver) {
-      if ((System.currentTimeMillis() / 500) % 2 == 0) {
-        g.drawString("Game Over: " + String.valueOf((int) score), 10, 35);
+      // Nền mờ chữ nhật
+      Graphics2D g2d = (Graphics2D) g;
+      g2d.setColor(new Color(0, 0, 0, 170)); // màu đen mờ
+      g2d.fillRoundRect(40, 180, 280, 220, 30, 30);
+
+      // Thiết lập font Arial 16
+      g.setFont(new Font("Arial", Font.BOLD, 18));
+      g.setColor(Color.WHITE);
+
+      // Canh giữa
+      int centerX = boardWidth / 2;
+
+      if (showGameOverText) {
+        g.setFont(new Font("Arial", Font.BOLD, 20));
+        g.setColor(Color.RED);
+        drawCenteredString(g, "GAME OVER", centerX, 210);
       }
-      g.drawString("Username: " + username, 100, 240);
-      g.drawString("Your Score: " + (int) score, 100, 270);
-      g.drawString("High Score: " + highScore, 100, 300);
+      g.setFont(new Font("Arial", Font.BOLD, 18));
+      drawCenteredString(g, "Username: " + username, centerX, 245);
+      drawCenteredString(g, "Your Score: " + (int) score, centerX, 270);
+      drawCenteredString(g, "High Score: " + highScore, centerX, 295);
+
       if ((int) score > highScore) {
         g.setColor(Color.YELLOW);
-        g.drawString("New Record!", 100, 330);
+        drawCenteredString(g, "NEW RECORD!", centerX, 320);
       }
+
       g.setColor(Color.WHITE);
-      g.drawString("Press SPACE to play again", 70, 380);
+      drawCenteredString(g, "Press SPACE to play again", centerX, 360);
     } else {
       g.drawString(String.valueOf((int) score), 10, 35);
     }
+  }
+
+  public void drawCenteredString(Graphics g, String text, int xCenter, int y) {
+    FontMetrics metrics = g.getFontMetrics(g.getFont());
+    int x = xCenter - metrics.stringWidth(text) / 2;
+    g.drawString(text, x, y);
   }
 
   public void move() {
@@ -287,6 +314,13 @@ public class FlappyBird extends JPanel implements ActionListener, KeyListener {
       placePipesTimer.stop();
       gameLoop.stop();
     }
+    if (gameOver && gameOverBlinkTimer == null) {
+      gameOverBlinkTimer = new Timer(500, blinkEvent -> {
+        showGameOverText = !showGameOverText;
+        repaint();
+      });
+      gameOverBlinkTimer.start();
+    }
   }
 
   @Override
@@ -303,6 +337,12 @@ public class FlappyBird extends JPanel implements ActionListener, KeyListener {
       SoundPlayer.play("./audio/flap.wav", 0.8f);
       velocityY = -9;
       if (gameOver) {
+
+        if (gameOverBlinkTimer != null) {
+          gameOverBlinkTimer.stop();
+          gameOverBlinkTimer = null;
+          showGameOverText = true;
+        }
         // restart the game by resetting the conditions
         bird.y = birdY;
         velocityY = 0;
