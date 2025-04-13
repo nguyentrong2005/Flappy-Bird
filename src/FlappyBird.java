@@ -3,11 +3,8 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyListener;
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Random;
-import javax.sound.sampled.*;
 import javax.swing.*;
 
 public class FlappyBird extends JPanel implements ActionListener, KeyListener {
@@ -108,8 +105,8 @@ public class FlappyBird extends JPanel implements ActionListener, KeyListener {
 
   public void startGame() {
     // start playing background music
-    playSound("./audio/start.wav", 1f);
-    playSound("./audio/background.wav", 1f);
+    SoundPlayer.play("./audio/start.wav", 1f);
+    SoundPlayer.play("./audio/background.wav", 1f);
   }
 
   public void placePipes() {
@@ -209,7 +206,7 @@ public class FlappyBird extends JPanel implements ActionListener, KeyListener {
       if (!topPipe.passed && bird.x > topPipe.x + topPipe.width) {
         topPipe.passed = true;
         bottomPipe.passed = true;
-        playSound("./audio/point.wav", 0.8f);
+        SoundPlayer.play("./audio/point.wav", 0.8f);
         score += 1;
         if (score % 5 == 0) {
           velocityX -= 1;
@@ -223,7 +220,7 @@ public class FlappyBird extends JPanel implements ActionListener, KeyListener {
 
       // if (!pipe.passed && bird.x > pipe.x + pipe.width) {
       // pipe.passed = true;
-      // playSound("./audio/point.wav", 0.9f);
+      // SoundPlayer.play("./audio/point.wav", 0.9f);
       // score += 0.5; // 0.5 because there are 2 pipes! so 0.5 * 2 = 1, 1 for each
       // set of pipes
       // }
@@ -252,43 +249,12 @@ public class FlappyBird extends JPanel implements ActionListener, KeyListener {
         a.y + a.height > b.y; // a's bottom left corner passes b's top left corner
   }
 
-  // Nhac nen
-  private static Clip background;
-
-  // Sound game
-  public void playSound(String soundFile, float volume) {
-    try (AudioInputStream audioStream = AudioSystem.getAudioInputStream(new File(soundFile))) {
-      Clip clip = AudioSystem.getClip();
-      clip.open(audioStream);
-
-      // volume
-      FloatControl gainControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
-      float min = gainControl.getMinimum();
-      float max = gainControl.getMaximum();
-      float dB = (max - min) * volume + min;
-      gainControl.setValue(dB);
-
-      if (soundFile.equals("./audio/background.wav")) {
-        if (background != null && background.isRunning()) {
-          return;
-        }
-        background = clip;
-        background.loop(Clip.LOOP_CONTINUOUSLY);
-      } else {
-        clip.start();
-      }
-
-    } catch (UnsupportedAudioFileException | IOException | LineUnavailableException e) {
-      System.err.println("Lỗi phát âm thanh: " + e.getMessage());
-    }
-  }
-
   @Override
   public void actionPerformed(ActionEvent e) {
     move();
     repaint();
     if (gameOver) {
-      playSound("./audio/hit.wav", 0.9f);
+      SoundPlayer.play("./audio/hit.wav", 0.9f);
       placePipesTimer.stop();
       gameLoop.stop();
     }
@@ -305,7 +271,7 @@ public class FlappyBird extends JPanel implements ActionListener, KeyListener {
         return;
       }
 
-      playSound("./audio/flap.wav", 0.8f);
+      SoundPlayer.play("./audio/flap.wav", 0.8f);
       velocityY = -9;
       if (gameOver) {
         // restart the game by resetting the conditions
@@ -328,7 +294,7 @@ public class FlappyBird extends JPanel implements ActionListener, KeyListener {
         // Random random = new Random();
         String randomSound = sounds[random.nextInt(sounds.length)];
 
-        playSound(randomSound, 1f);
+        SoundPlayer.play(randomSound, 1f);
       }
     }
   }

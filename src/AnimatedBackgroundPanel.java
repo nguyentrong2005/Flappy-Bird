@@ -7,7 +7,7 @@ public class AnimatedBackgroundPanel extends JPanel {
   Image bgImg, topPipeImg, bottomPipeImg;
   ArrayList<Rectangle> pipes;
   Timer timer;
-  int velocityX = -2;
+  int velocityX = -4;
   int pipeWidth = 64;
   int pipeHeight = 512;
   int gap = 150;
