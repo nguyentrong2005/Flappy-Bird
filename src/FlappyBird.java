@@ -35,6 +35,7 @@ public class FlappyBird extends JPanel implements ActionListener, KeyListener {
 
   // game start
   boolean gameStarted = false;
+  boolean canRestart = true;
 
   public class Bird {
 
@@ -111,7 +112,7 @@ public class FlappyBird extends JPanel implements ActionListener, KeyListener {
     placePipesTimer = new Timer(1500, e -> placePipes());
 
     // game timer
-    gameLoop = new Timer(1000 / 60, this); // 1000ms/60fps = 16.6666666667ms
+    gameLoop = new Timer(1000 / 60, this);
 
     if (gameStarted) {
       placePipesTimer.start();
@@ -120,16 +121,11 @@ public class FlappyBird extends JPanel implements ActionListener, KeyListener {
   }
 
   public void startGame() {
-    // start playing background music
     SoundPlayer.play("./audio/start.wav", 1f);
     SoundPlayer.play("./audio/background.wav", 1f);
   }
 
   public void placePipes() {
-    // (0-1) * pipeHeight/2 -> (0-256)
-    // 128
-    // 0 - 128 - (0-256) --> pipeHeight/4 -> 3/4 pipeHeight
-
     int randomPipeY = (int) (pipeY - pipeHeight / 4 - Math.random() * (pipeHeight / 2));
     int openingSpace = (score >= 10) ? boardHeight / 5 : boardHeight / 4;
 
@@ -265,16 +261,6 @@ public class FlappyBird extends JPanel implements ActionListener, KeyListener {
           moveSpeed += 1;
         }
       }
-
-      // if (!pipe.passed && bird.x > pipe.x + pipe.width) {
-      // pipe.passed = true;
-      // SoundPlayer.play("./audio/point.wav", 0.9f);
-      // score += 0.5; // 0.5 because there are 2 pipes! so 0.5 * 2 = 1, 1 for each
-      // set of pipes
-      // }
-      // if (collision(bird, pipe)) {
-      // //gameOver = true;
-      // }
       if (collision(bird, topPipe) || collision(bird, bottomPipe)) {
         gameOver = true;
       }
@@ -313,6 +299,15 @@ public class FlappyBird extends JPanel implements ActionListener, KeyListener {
       SoundPlayer.play("./audio/hit.wav", 0.9f);
       placePipesTimer.stop();
       gameLoop.stop();
+
+      canRestart = false;
+      new Timer(1000, new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent evt) {
+          canRestart = true;
+          ((Timer) evt.getSource()).stop();
+        }
+      }).start();
     }
     if (gameOver && gameOverBlinkTimer == null) {
       gameOverBlinkTimer = new Timer(500, blinkEvent -> {
@@ -337,6 +332,7 @@ public class FlappyBird extends JPanel implements ActionListener, KeyListener {
       SoundPlayer.play("./audio/flap.wav", 0.8f);
       velocityY = -9;
       if (gameOver) {
+        if (!canRestart) return;
 
         if (gameOverBlinkTimer != null) {
           gameOverBlinkTimer.stop();
@@ -350,6 +346,7 @@ public class FlappyBird extends JPanel implements ActionListener, KeyListener {
         pipes.clear();
         score = 0;
         gameOver = false;
+        canRestart = true;
         gameLoop.start();
         placePipesTimer.start();
 
