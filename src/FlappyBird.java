@@ -12,10 +12,7 @@ public class FlappyBird extends JPanel implements ActionListener, KeyListener {
   public static final int BOARD_WIDTH = 360;
   public static final int BOARD_HEIGHT = 640;
 
-  public static final int PIPE_GAP = BOARD_HEIGHT / 4; // Khoảng cách trên/dưới giữa 2 cột
   public static final int PIPE_SPACING = 1500; // ms giữa mỗi lần tạo cột
-  public static final int PIPE_SPEED = -4; // tốc độ cột di chuyển ngang
-  public static final int PIPE_VERTICAL_SPEED = 2; // tốc độ lên xuống của cột nếu có
 
   public static final int BIRD_JUMP = -9; // độ nhảy lên của chim
   public static final int BIRD_GRAVITY = 1; // trọng lực kéo chim rơi
@@ -78,6 +75,34 @@ public class FlappyBird extends JPanel implements ActionListener, KeyListener {
     }
   }
 
+  class DifficultyManager {
+    private static final int[] scoreThresholds = { 0, 10, 30, 50, 70, 100 };
+
+    public static int getLevel(double score) {
+      for (int i = scoreThresholds.length - 1; i >= 0; i--) {
+        if (score >= scoreThresholds[i])
+          return i;
+      }
+      return 0;
+    }
+
+    public static int getPipeSpeed(int level) {
+      return -3 - level;
+    }
+
+    public static int getPipeVerticalSpeed(int level) {
+      return (level >= 1) ? 2 + level / 2 : 0;
+    }
+
+    public static int getPipeGap(int level) {
+      return Math.max(90, FlappyBird.BOARD_HEIGHT / 4 - level * 15);
+    }
+
+    public static boolean shouldMovePipes(int level) {
+      return level >= 1;
+    }
+  }
+
   // === Constructor ===
   FlappyBird(String username) {
     this.username = username;
@@ -116,6 +141,8 @@ public class FlappyBird extends JPanel implements ActionListener, KeyListener {
   }
 
   public void placePipes() {
+    int level = DifficultyManager.getLevel(score);
+    int pipeGap = DifficultyManager.getPipeGap(level);
     int randomPipeY = (int) (pipeY - pipeHeight / 4 - Math.random() * (pipeHeight / 2));
 
     Pipe topPipe = new Pipe(topPipeImg);
@@ -123,7 +150,7 @@ public class FlappyBird extends JPanel implements ActionListener, KeyListener {
     pipes.add(topPipe);
 
     Pipe bottomPipe = new Pipe(bottomPipeImg);
-    bottomPipe.y = topPipe.y + pipeHeight + PIPE_GAP;
+    bottomPipe.y = topPipe.y + pipeHeight + pipeGap;
     pipes.add(bottomPipe);
   }
 
@@ -194,12 +221,17 @@ public class FlappyBird extends JPanel implements ActionListener, KeyListener {
     bird.y += velocityY;
     bird.y = Math.max(bird.y, 0);
 
+    int level = DifficultyManager.getLevel(score);
+    int pipeSpeed = DifficultyManager.getPipeSpeed(level);
+    int pipeVerticalSpeed = DifficultyManager.getPipeVerticalSpeed(level);
+    boolean movePipes = DifficultyManager.shouldMovePipes(level);
+
     for (int i = 0; i < pipes.size(); i += 2) {
       Pipe topPipe = pipes.get(i);
       Pipe bottomPipe = pipes.get(i + 1);
 
-      topPipe.x += PIPE_SPEED;
-      bottomPipe.x += PIPE_SPEED;
+      topPipe.x += pipeSpeed;
+      bottomPipe.x += pipeSpeed;
 
       if (score >= 5) {
         int limitBottom = BOARD_HEIGHT - 120;
@@ -209,11 +241,11 @@ public class FlappyBird extends JPanel implements ActionListener, KeyListener {
         }
 
         if (topPipe.move) {
-          topPipe.y += PIPE_VERTICAL_SPEED;
-          bottomPipe.y += PIPE_VERTICAL_SPEED;
+          topPipe.y += pipeVerticalSpeed;
+          bottomPipe.y += pipeVerticalSpeed;
         } else {
-          topPipe.y -= PIPE_VERTICAL_SPEED;
-          bottomPipe.y -= PIPE_VERTICAL_SPEED;
+          topPipe.y -= pipeVerticalSpeed;
+          bottomPipe.y -= pipeVerticalSpeed;
         }
       }
 
