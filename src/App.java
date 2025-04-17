@@ -2,9 +2,9 @@ import javax.swing.*;
 
 public class App {
   public static void main(String[] args) {
-    new LoginRegisterFrame(); // Gọi màn hình đăng nhập trước
+    new LoginRegisterFrame();
   }
-
+  
   public static void launchGame(String username) {
     int boardWidth = 360;
     int boardHeight = 640;
