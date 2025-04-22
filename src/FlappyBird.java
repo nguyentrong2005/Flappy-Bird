@@ -200,7 +200,7 @@ public class FlappyBird extends JPanel implements ActionListener, KeyListener {
 
       if ((int) score > highScore) {
         g.setColor(Color.YELLOW);
-        drawCenteredString(g, "NEW RECORD!", centerX, 320);
+        drawCenteredString(g, "NEW RECORD!", centerX, 330);
       }
 
       g.setColor(Color.WHITE);
@@ -281,15 +281,6 @@ public class FlappyBird extends JPanel implements ActionListener, KeyListener {
     repaint();
 
     if (gameOver) {
-      if ((int) score > highScore) {
-        highScore = (int) score;
-        try {
-          AuthManager.saveHighScore(username, highScore);
-        } catch (Exception ex) {
-          ex.printStackTrace();
-        }
-      }
-
       SoundPlayer.play("./audio/hit.wav", 0.9f);
       placePipesTimer.stop();
       gameLoop.stop();
@@ -318,6 +309,15 @@ public class FlappyBird extends JPanel implements ActionListener, KeyListener {
       velocityY = BIRD_JUMP;
 
       if (gameOver) {
+        if ((int) score > highScore) {
+          highScore = (int) score;
+          try {
+            AuthManager.saveHighScore(username, highScore);
+          } catch (Exception ex) {
+            ex.printStackTrace();
+          }
+        }
+        
         if (gameOverBlinkTimer != null) {
           gameOverBlinkTimer.stop();
           gameOverBlinkTimer = null;
